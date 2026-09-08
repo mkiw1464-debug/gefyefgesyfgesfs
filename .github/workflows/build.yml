@@ -1,0 +1,65 @@
+name: Build IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+          xcodebuild -version
+
+      - name: Build archive
+        run: |
+          set +e
+          xcodebuild archive \
+            -project FFExternal.xcodeproj \
+            -target FFExternal \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/FFExternal.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            2>&1 | tee "$RUNNER_TEMP/build.log"
+
+          STATUS=${PIPESTATUS[0]}
+
+          echo ""
+          echo "========== ACTUAL ERRORS =========="
+          grep -E "error:|fatal error:|ARCHIVE FAILED|BUILD FAILED" "$RUNNER_TEMP/build.log" || true
+          echo "==================================="
+
+          exit $STATUS
+
+      - name: Create unsigned IPA
+        run: |
+          set -e
+          APP_PATH="$RUNNER_TEMP/FFExternal.xcarchive/Products/Applications/FFExternal.app"
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "ERROR: FFExternal.app was not produced."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
+
+          cd "$RUNNER_TEMP"
+          /usr/bin/zip -qry FFExternal-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFExternal-unsigned-ipa
+          path: ${{ runner.temp }}/FFExternal-unsigned.ipa
+          if-no-files-found: error
