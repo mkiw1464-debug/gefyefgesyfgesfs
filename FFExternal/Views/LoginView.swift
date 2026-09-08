@@ -174,24 +174,21 @@ struct LoginView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
-                        .background(
-                            Group {
-                                if keyInput.isEmpty {
-                                    LinearGradient(
-                                        colors: [Color.white.opacity(0.10), Color.white.opacity(0.07)],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing
-                                    )
-                                } else {
-                                    LinearGradient(
-                                        colors: [
-                                            Color(red: 0.35, green: 0.22, blue: 0.92),
-                                            Color(red: 0.12, green: 0.50, blue: 0.95)
-                                        ],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing
-                                    )
-                                }
-                            },
-                            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .background(
+    keyInput.isEmpty
+        ? LinearGradient(
+            colors: [Color.white.opacity(0.10), Color.white.opacity(0.07)],
+            startPoint: .topLeading, endPoint: .bottomTrailing
+        )
+        : LinearGradient(
+            colors: [
+                Color(red: 0.35, green: 0.22, blue: 0.92),
+                Color(red: 0.12, green: 0.50, blue: 0.95)
+            ],
+            startPoint: .topLeading, endPoint: .bottomTrailing
+        ),
+    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+)
                         )
                         .shadow(
                             color: keyInput.isEmpty
