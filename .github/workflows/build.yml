@@ -16,46 +16,64 @@ jobs:
 
       - name: Select Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+          if [ -d "/Applications/Xcode_16.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.4.app
+          fi
+
           xcodebuild -version
+
+      - name: Check project
+        run: |
+          echo "=== PROJECT ==="
+          ls -la
+          echo "=== XCODEPROJ ==="
+          ls -la FFExternal.xcodeproj
+          echo "=== SCHEMES ==="
+          xcodebuild -list -project FFExternal.xcodeproj
 
       - name: Build archive
         run: |
-          set +e
+          set -e
+
+          rm -rf "$RUNNER_TEMP/FFExternal.xcarchive"
+
           xcodebuild archive \
             -project FFExternal.xcodeproj \
-            -target FFExternal \
+            -scheme FFExternal \
             -configuration Release \
+            -sdk iphoneos \
             -archivePath "$RUNNER_TEMP/FFExternal.xcarchive" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            2>&1 | tee "$RUNNER_TEMP/build.log"
-
-          STATUS=${PIPESTATUS[0]}
-
-          echo ""
-          echo "========== ACTUAL ERRORS =========="
-          grep -E "error:|fatal error:|ARCHIVE FAILED|BUILD FAILED" "$RUNNER_TEMP/build.log" || true
-          echo "==================================="
-
-          exit $STATUS
+            CODE_SIGN_IDENTITY=""
 
       - name: Create unsigned IPA
         run: |
           set -e
+
           APP_PATH="$RUNNER_TEMP/FFExternal.xcarchive/Products/Applications/FFExternal.app"
+
+          echo "Checking:"
+          echo "$APP_PATH"
 
           if [ ! -d "$APP_PATH" ]; then
             echo "ERROR: FFExternal.app was not produced."
+            find "$RUNNER_TEMP/FFExternal.xcarchive" -maxdepth 5 -print || true
             exit 1
           fi
 
+          rm -rf "$RUNNER_TEMP/Payload"
           mkdir -p "$RUNNER_TEMP/Payload"
-          cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
+
+          cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/FFExternal.app"
 
           cd "$RUNNER_TEMP"
+          rm -f FFExternal-unsigned.ipa
+
           /usr/bin/zip -qry FFExternal-unsigned.ipa Payload
+
+          echo "IPA created:"
+          ls -lh FFExternal-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
