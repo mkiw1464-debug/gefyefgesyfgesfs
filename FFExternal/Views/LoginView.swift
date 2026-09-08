@@ -172,30 +172,30 @@ struct LoginView: View {
                                 .foregroundStyle(.white)
                             }
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 17)
-                    .background(
-    keyInput.isEmpty
-        ? LinearGradient(
-            colors: [Color.white.opacity(0.10), Color.white.opacity(0.07)],
-            startPoint: .topLeading, endPoint: .bottomTrailing
-        )
-        : LinearGradient(
-            colors: [
-                Color(red: 0.35, green: 0.22, blue: 0.92),
-                Color(red: 0.12, green: 0.50, blue: 0.95)
-            ],
-            startPoint: .topLeading, endPoint: .bottomTrailing
-        ),
-    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-)
-                        )
-                        .shadow(
-                            color: keyInput.isEmpty
-                                ? .clear
-                                : Color(red: 0.25, green: 0.30, blue: 0.90).opacity(0.50),
-                            radius: 12, y: 4
-                        )
+                 // LINES 175-199 (corrected)
+                     .frame(maxWidth: .infinity)
+                     .padding(.vertical, 17)
+                     .background(
+                         keyInput.isEmpty
+                             ? LinearGradient(
+                                 colors: [Color.white.opacity(0.10), Color.white.opacity(0.07)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing
+                             )
+                             : LinearGradient(
+                                 colors: [
+                                     Color(red: 0.35, green: 0.22, blue: 0.92),
+                                     Color(red: 0.12, green: 0.50, blue: 0.95)
+                                 ],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing
+                             ),
+                         in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                     )
+                     .shadow(
+                         color: keyInput.isEmpty
+                             ? .clear
+                             : Color(red: 0.25, green: 0.30, blue: 0.90).opacity(0.50),
+                         radius: 12, y: 4
+                     )
                     }
                     .disabled(keyInput.trimmingCharacters(in: .whitespaces).isEmpty || isValidating)
                     .padding(.horizontal, 22)
