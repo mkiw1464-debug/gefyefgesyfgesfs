@@ -221,7 +221,7 @@ struct InlineLanguagePickerView: View {
                             Rectangle()
                                 .fill(Color.white.opacity(0.06))
                                 .frame(height: 1)
-                                .padding(.horizontal: 20)
+                                .padding(.horizontal, 20)
                         }
                     }
                 }
