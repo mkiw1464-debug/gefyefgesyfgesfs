@@ -136,12 +136,14 @@ struct InjectTerminalView: View {
                 .transition(.scale(scale: 0.82).combined(with: .opacity))
             }
         }
-        .background(
-            ZStack {
-                Color(red: 0.04, green: 0.05, blue: 0.10)
-                Color.white.opacity(0.02)
-            },
-            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+     .background(
+    Color(red: 0.04, green: 0.05, blue: 0.10),
+    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+)
+.overlay(
+    RoundedRectangle(cornerRadius: 18, style: .continuous)
+        .fill(Color.white.opacity(0.02))
+)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
